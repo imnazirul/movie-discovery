@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@theme inline {
+  --font-poppins: var(--font-poppins);
+}
+
+body {
+  font-family: var(--font-poppins), Helvetica, sans-serif;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
