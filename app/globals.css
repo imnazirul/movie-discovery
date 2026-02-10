@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    /* Primary Brand Colors - Deep Cinema Blue */
+    --primary: 218 100% 35%;
+    --primary-foreground: 0 0% 98%;
+    
+    /* Neutral Colors */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+    --card: 220 20% 15%;
+    --card-foreground: 0 0% 95%;
+    --popover: 220 20% 15%;
+    --popover-foreground: 0 0% 95%;
+    
+    /* Secondary & Accent */
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 95%;
+    --accent: 45 100% 50%;
+    --accent-foreground: 0 0% 8%;
+    
+    /* UI Elements */
+    --muted: 220 15% 25%;
+    --muted-foreground: 0 0% 70%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 15% 25%;
+    --input: 220 15% 25%;
+    --ring: 218 100% 35%;
+    --radius: 0.5rem;
+    
+    /* Charts */
+    --chart-1: 218 100% 35%;
+    --chart-2: 45 100% 50%;
+    --chart-3: 199 89% 48%;
+    --chart-4: 279 100% 52%;
+    --chart-5: 19 87% 54%;
+  }
+  .dark {
+    /* Dark mode is the default */
+    --primary: 218 100% 50%;
+    --primary-foreground: 0 0% 8%;
+    --background: 0 0% 5%;
+    --foreground: 0 0% 98%;
+    --card: 220 25% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 25% 12%;
+    --popover-foreground: 0 0% 98%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 45 100% 55%;
+    --accent-foreground: 0 0% 8%;
+    --muted: 220 15% 22%;
+    --muted-foreground: 0 0% 72%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    --ring: 218 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
