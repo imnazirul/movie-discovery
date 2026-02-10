@@ -1,112 +1,111 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import Image from "next/image"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { get } from "@/helpers/api"
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { get } from "@/helpers/api";
 
 interface Genre {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
 interface Movie {
-  backdrop_path: string | null
-  poster_path: string | null
+  backdrop_path: string | null;
+  poster_path: string | null;
 }
 
 interface GenreWithImage extends Genre {
-  backdropUrl: string
+  backdropUrl: string;
 }
 
-const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/original"
+const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/original";
 
 export default function HeroSlider() {
-  const [genres, setGenres] = useState<GenreWithImage[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [genres, setGenres] = useState<GenreWithImage[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     async function fetchGenresWithImages() {
       try {
-        const genreData = await get("/genre/movie/list")
-        const genresWithImages: GenreWithImage[] = []
+        const genreData = await get("/genre/movie/list");
+        const genresWithImages: GenreWithImage[] = [];
 
-        // Fetch a movie for each genre to get backdrop image
         for (const genre of genreData.genres.slice(0, 10)) {
           try {
             const moviesData = await get("/discover/movie", {
               with_genres: genre.id,
               sort_by: "popularity.desc",
               page: 1,
-            })
-            
+            });
+
             const movieWithBackdrop = moviesData.results?.find(
-              (movie: Movie) => movie.backdrop_path
-            )
-            
+              (movie: Movie) => movie.backdrop_path,
+            );
+
             if (movieWithBackdrop) {
               genresWithImages.push({
                 ...genre,
                 backdropUrl: `${TMDB_IMAGE_BASE}${movieWithBackdrop.backdrop_path}`,
-              })
+              });
             }
           } catch (error) {
-            console.error(`Failed to fetch movies for genre ${genre.name}`)
+            //err
           }
         }
 
-        setGenres(genresWithImages)
-        setIsLoading(false)
+        setGenres(genresWithImages);
+        setIsLoading(false);
       } catch (error) {
-        console.error("Failed to fetch genres:", error)
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchGenresWithImages()
-  }, [])
+    fetchGenresWithImages();
+  }, []);
 
-  const goToSlide = useCallback((index: number) => {
-    if (isTransitioning) return
-    setIsTransitioning(true)
-    setCurrentIndex(index)
-    setTimeout(() => setIsTransitioning(false), 500)
-  }, [isTransitioning])
+  const goToSlide = useCallback(
+    (index: number) => {
+      if (isTransitioning) return;
+      setIsTransitioning(true);
+      setCurrentIndex(index);
+      setTimeout(() => setIsTransitioning(false), 500);
+    },
+    [isTransitioning],
+  );
 
   const goToPrevious = useCallback(() => {
-    const newIndex = currentIndex === 0 ? genres.length - 1 : currentIndex - 1
-    goToSlide(newIndex)
-  }, [currentIndex, genres.length, goToSlide])
+    const newIndex = currentIndex === 0 ? genres.length - 1 : currentIndex - 1;
+    goToSlide(newIndex);
+  }, [currentIndex, genres.length, goToSlide]);
 
   const goToNext = useCallback(() => {
-    const newIndex = currentIndex === genres.length - 1 ? 0 : currentIndex + 1
-    goToSlide(newIndex)
-  }, [currentIndex, genres.length, goToSlide])
+    const newIndex = currentIndex === genres.length - 1 ? 0 : currentIndex + 1;
+    goToSlide(newIndex);
+  }, [currentIndex, genres.length, goToSlide]);
 
-  // Auto-slide every 5 seconds
   useEffect(() => {
-    if (genres.length === 0) return
-    const interval = setInterval(goToNext, 5000)
-    return () => clearInterval(interval)
-  }, [genres.length, goToNext])
+    if (genres.length === 0) return;
+    const interval = setInterval(goToNext, 5000);
+    return () => clearInterval(interval);
+  }, [genres.length, goToNext]);
 
   if (isLoading) {
     return (
       <section className="relative h-[500px] md:h-[600px] flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </section>
-    )
+    );
   }
 
   if (genres.length === 0) {
-    return null
+    return null;
   }
 
   return (
     <section className="relative h-[500px] md:h-[600px] overflow-hidden bg-gray-900">
-      {/* Background Images */}
       {genres.map((genre, index) => (
         <div
           key={genre.id}
@@ -121,19 +120,16 @@ export default function HeroSlider() {
             className="object-cover"
             priority={index === 0}
           />
-          {/* Dark overlay for better contrast */}
+
           <div className="absolute inset-0 bg-black/40 dark:bg-black/50" />
-          {/* Bottom gradient for smooth transition to content below */}
+
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent" />
         </div>
       ))}
 
-      {/* Slider Content */}
       <div className="relative h-full flex items-center justify-center z-10 pt-16">
         <div className="w-full max-w-6xl mx-auto px-4">
-          {/* Genre Cards Slider */}
           <div className="relative flex items-center justify-center">
-            {/* Previous Button */}
             <button
               onClick={goToPrevious}
               className="absolute left-2 md:left-4 z-20 p-2 md:p-3 rounded-full bg-white/20 dark:bg-black/30 backdrop-blur-md border border-white/30 dark:border-white/20 text-white hover:bg-white/30 dark:hover:bg-black/50 transition-all duration-200 hover:scale-110 shadow-lg"
@@ -142,14 +138,13 @@ export default function HeroSlider() {
               <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
 
-            {/* Genre Cards */}
             <div className="flex items-center justify-center gap-3 md:gap-5 overflow-hidden px-14 md:px-20">
               {genres.map((genre, index) => {
-                const distance = Math.abs(index - currentIndex)
-                const isActive = index === currentIndex
-                const isVisible = distance <= 2
+                const distance = Math.abs(index - currentIndex);
+                const isActive = index === currentIndex;
+                const isVisible = distance <= 2;
 
-                if (!isVisible) return null
+                if (!isVisible) return null;
 
                 return (
                   <button
@@ -159,8 +154,8 @@ export default function HeroSlider() {
                       isActive
                         ? "w-52 h-36 md:w-72 md:h-48 scale-100 z-10"
                         : distance === 1
-                        ? "w-36 h-28 md:w-48 md:h-36 scale-95 opacity-70"
-                        : "w-28 h-22 md:w-36 md:h-28 scale-85 opacity-40"
+                          ? "w-36 h-28 md:w-48 md:h-36 scale-95 opacity-70"
+                          : "w-28 h-22 md:w-36 md:h-28 scale-85 opacity-40"
                     }`}
                   >
                     <Image
@@ -169,13 +164,15 @@ export default function HeroSlider() {
                       fill
                       className="object-cover"
                     />
-                    {/* Card overlay */}
-                    <div className={`absolute inset-0 transition-all duration-500 ${
-                      isActive 
-                        ? "bg-gradient-to-t from-black/70 via-black/30 to-transparent" 
-                        : "bg-black/50 dark:bg-black/60"
-                    }`} />
-                    {/* Genre name */}
+
+                    <div
+                      className={`absolute inset-0 transition-all duration-500 ${
+                        isActive
+                          ? "bg-gradient-to-t from-black/70 via-black/30 to-transparent"
+                          : "bg-black/50 dark:bg-black/60"
+                      }`}
+                    />
+
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span
                         className={`font-bold text-white text-center px-3 drop-shadow-lg transition-all duration-500 ${
@@ -187,16 +184,15 @@ export default function HeroSlider() {
                         {genre.name}
                       </span>
                     </div>
-                    {/* Active border */}
+
                     {isActive && (
                       <div className="absolute inset-0 border-3 border-primary rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.5)]" />
                     )}
                   </button>
-                )
+                );
               })}
             </div>
 
-            {/* Next Button */}
             <button
               onClick={goToNext}
               className="absolute right-2 md:right-4 z-20 p-2 md:p-3 rounded-full bg-white/20 dark:bg-black/30 backdrop-blur-md border border-white/30 dark:border-white/20 text-white hover:bg-white/30 dark:hover:bg-black/50 transition-all duration-200 hover:scale-110 shadow-lg"
@@ -206,7 +202,6 @@ export default function HeroSlider() {
             </button>
           </div>
 
-          {/* Dots Indicator */}
           <div className="flex items-center justify-center gap-2 mt-10">
             {genres.map((genre, index) => (
               <button
@@ -224,5 +219,5 @@ export default function HeroSlider() {
         </div>
       </div>
     </section>
-  )
+  );
 }
