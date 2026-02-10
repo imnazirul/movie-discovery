@@ -55,16 +55,16 @@ const TopRatedMovies = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-10">
           <div className="opacity-0 animate-fade-in-up">
-            <h2 className="text-2xl font- md:text-3xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-xl  md:text-3xl font-bold text-gray-900 dark:text-white">
               Top Rated Movies
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-gray-600 max-sm:text-xs dark:text-gray-400 mt-1">
               Highest rated movies of all time
             </p>
           </div>
           <Link
-            href="/top-rated"
-            className="group flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:scale-105 opacity-0 animate-fade-in-up"
+            href={`/movies?type=movies&value=toprated&page=1`}
+            className="group max-sm:text-xs flex items-center gap-2 px-3 md:px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:scale-105 opacity-0 animate-fade-in-up"
           >
             View All
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

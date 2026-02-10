@@ -30,7 +30,7 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const navItems = ["Home", "Search", "Movies", "About"];
+    const navItems = ["Home", "Search", "Movies", "Genre"];
 
     return (
         <header
@@ -45,7 +45,7 @@ export default function Navbar() {
                         variant="ghost"
                         size="icon"
                         className="md:hidden mr-2"
-                        onClick={() => setIsMenuOpen(true)}
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         <Menu
                             className={`h-6 w-6 ${isScrolled
@@ -113,7 +113,7 @@ export default function Navbar() {
                     : "opacity-0 -translate-y-5 pointer-events-none"
                     }`}
             >
-                <div className="max-w-3xl mx-auto flex items-center">
+                <div className="md:max-w-3xl sm:max-w-full mx-auto justify-center flex items-center">
                     <Input
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && searchQuery.trim()) {
@@ -124,7 +124,7 @@ export default function Navbar() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         type="text"
                         placeholder="Search for movies..."
-                        className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
+                        className="md:flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
                         autoFocus={isSearchOpen}
                     />
                     <Button
@@ -135,7 +135,7 @@ export default function Navbar() {
                                 router.push(`/movies?type=search&value=${searchQuery}&page=1`)
                             }
                         }}
-                        className="ml-2"
+                        className="ml-2 max-sm:px-2 "
                     >
                         <Search className="h-5 w-5 text-gray-900 dark:text-white" />
                     </Button>
@@ -143,7 +143,7 @@ export default function Navbar() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setIsSearchOpen(false)}
-                        className="ml-2"
+                        className="ml-2 max-sm:px-2 "
                     >
                         <X className="h-5 w-5 text-gray-900 dark:text-white" />
                     </Button>
@@ -152,7 +152,7 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             <div
-                className={`fixed inset-0 bg-white dark:bg-gray-900 z-50 p-4 transition-transform duration-300 ease-out ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed  backdrop-blur-3xl bg-white dark:bg-gray-900 z-50 p-4 transition-transform duration-300 ease-out ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 <div className="flex justify-between items-center mb-8">

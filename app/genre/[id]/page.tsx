@@ -1,30 +1,21 @@
 "use client";
 
+import { use } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { useFetch } from "@/helpers/hooks";
-import {
-  fetchTopRatedMovies,
-  fetchPopularMovies,
-  fetchDiscoverMovies,
-  searchMovies,
-  fetchNowPlayingMovies,
-  fetchUpcomingMovies,
-} from "@/helpers/backend";
+import { fetchMoviesByGenre, fetchGenreList } from "@/helpers/backend";
 import Image from "next/image";
 import Link from "next/link";
 import {
   Star,
-  Search,
-  X,
   Film,
-  TrendingUp,
-  Clock,
-  Calendar,
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  Tag,
 } from "lucide-react";
+import { useIsMobile } from "@/lib/use-mobile";
 
 interface Movie {
   id: number;
@@ -36,163 +27,62 @@ interface Movie {
   overview: string;
 }
 
+interface Genre {
+  id: number;
+  name: string;
+}
+
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
-function MoviesContent() {
+export function GenreMoviesContent({ genreId }: { genreId: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const queryType = searchParams.get("type");
-  const queryValue = searchParams.get("value");
-  const showSearch = searchParams.get("search");
   const pageParam = searchParams.get("page");
-
+  const sortParam = searchParams.get("sort") || "popularity.desc";
   const [currentPage, setCurrentPage] = useState(
     pageParam ? parseInt(pageParam) : 1,
   );
-  const [searchQuery, setSearchQuery] = useState(
-    queryType === "search" ? queryValue || "" : "",
-  );
-  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
 
   useEffect(() => {
     const newPage = pageParam ? parseInt(pageParam) : 1;
     setCurrentPage(newPage);
   }, [pageParam]);
+  const isMobile = useIsMobile();
+  const { data: genreData } = useFetch(["genre-list"], fetchGenreList);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  const { data, isPending } = useFetch(
+    ["movies-by-genre", genreId, currentPage, sortParam],
+    () =>
+      fetchMoviesByGenre({
+        with_genres: genreId,
+        page: currentPage,
+        sort_by: sortParam,
+      }),
+  );
 
-  const getQueryKey = () => {
-    if (queryType === "search" && queryValue) {
-      return ["search-movies", queryValue, currentPage];
-    }
-    if (queryType === "movies") {
-      switch (queryValue) {
-        case "toprated":
-          return ["top-rated-movies-all", currentPage];
-        case "popular":
-          return ["popular-movies-all", currentPage];
-        case "nowplaying":
-          return ["now-playing-movies", currentPage];
-        case "upcoming":
-          return ["upcoming-movies", currentPage];
-        default:
-          return ["discover-movies", currentPage];
-      }
-    }
-    if (debouncedSearch && showSearch === "true") {
-      return ["search-movies", debouncedSearch, currentPage];
-    }
-    return ["discover-movies", currentPage];
-  };
-
-  const getQueryFn = () => {
-    if (queryType === "search" && queryValue) {
-      return () => searchMovies({ query: queryValue, page: currentPage });
-    }
-    if (queryType === "movies") {
-      switch (queryValue) {
-        case "toprated":
-          return () => fetchTopRatedMovies({ page: currentPage });
-        case "popular":
-          return () => fetchPopularMovies({ page: currentPage });
-        case "nowplaying":
-          return () => fetchNowPlayingMovies({ page: currentPage });
-        case "upcoming":
-          return () => fetchUpcomingMovies({ page: currentPage });
-        default:
-          return () => fetchDiscoverMovies({ page: currentPage });
-      }
-    }
-    if (debouncedSearch && showSearch === "true") {
-      return () => searchMovies({ query: debouncedSearch, page: currentPage });
-    }
-    return () => fetchDiscoverMovies({ page: currentPage });
-  };
-
-  const getPageTitle = () => {
-    if (queryType === "search" && queryValue) {
-      return `Search Results for "${queryValue}"`;
-    }
-    if (queryType === "movies") {
-      switch (queryValue) {
-        case "toprated":
-          return "Top Rated Movies";
-        case "popular":
-          return "Popular Movies";
-        case "nowplaying":
-          return "Now Playing";
-        case "upcoming":
-          return "Upcoming Movies";
-        default:
-          return "Discover Movies";
-      }
-    }
-    if (debouncedSearch && showSearch === "true") {
-      return `Search Results for "${debouncedSearch}"`;
-    }
-    return "Discover Movies";
-  };
-
-  const getPageIcon = () => {
-    if (queryType === "movies") {
-      switch (queryValue) {
-        case "toprated":
-          return <Star className="w-6 h-6 text-yellow-500" />;
-        case "popular":
-          return <TrendingUp className="w-6 h-6 text-red-500" />;
-        case "nowplaying":
-          return <Clock className="w-6 h-6 text-green-500" />;
-        case "upcoming":
-          return <Calendar className="w-6 h-6 text-blue-500" />;
-        default:
-          return <Film className="w-6 h-6 text-primary" />;
-      }
-    }
-    if (queryType === "search" || (showSearch === "true" && debouncedSearch)) {
-      return <Search className="w-6 h-6 text-primary" />;
-    }
-    return <Film className="w-6 h-6 text-primary" />;
-  };
-
-  const { data, isPending } = useFetch(getQueryKey(), getQueryFn());
-
+  const genres: Genre[] = genreData?.genres || [];
+  const currentGenre = genres.find((g) => g.id === parseInt(genreId));
   const movies: Movie[] = data?.results || [];
-  const totalPages = Math.min(data?.total_pages || 1, 500); // TMDB limits to 500 pages
+  const totalPages = Math.min(data?.total_pages || 1, 500);
   const totalResults = data?.total_results || 0;
 
-  const buildPageUrl = (page: number) => {
-    const params = new URLSearchParams();
-    if (queryType) params.set("type", queryType);
-    if (queryValue) params.set("value", queryValue);
-    if (showSearch) params.set("search", showSearch);
-    params.set("page", page.toString());
-    return `/movies?${params.toString()}`;
-  };
+  const sortOptions = [
+    { value: "popularity.desc", label: "Most Popular" },
+    { value: "vote_average.desc", label: "Highest Rated" },
+    { value: "release_date.desc", label: "Newest First" },
+    { value: "release_date.asc", label: "Oldest First" },
+    { value: "title.asc", label: "A-Z" },
+  ];
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    router.push(buildPageUrl(page));
+    router.push(`/genre/${genreId}?page=${page}&sort=${sortParam}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(
-        `/movies?type=search&value=${encodeURIComponent(searchQuery)}&search=true&page=1`,
-      );
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    router.push("/movies?search=true");
+  const handleSortChange = (newSort: string) => {
+    router.push(`/genre/${genreId}?page=1&sort=${newSort}`);
   };
 
   const getPageNumbers = () => {
@@ -241,78 +131,63 @@ function MoviesContent() {
           Back to Home
         </Link>
 
-        {showSearch === "true" && (
-          <div
-            className="mb-8 opacity-0 animate-fade-in-up"
-            style={{ animationDelay: "50ms" }}
-          >
-            <form onSubmit={handleSearch} className="relative max-w-2xl">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for movies..."
-                className="w-full px-5 py-4 pl-12 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-800 focus:outline-none focus:ring-2 focus:ring-primary shadow-lg text-lg"
-                autoFocus
-              />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-400" />
-                </button>
-              )}
-            </form>
-          </div>
-        )}
-
         <div
-          className="flex items-center gap-4 mb-8 opacity-0 animate-fade-in-up"
+          className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 opacity-0 animate-fade-in-up"
           style={{ animationDelay: "100ms" }}
         >
-          <div className="p-3 bg-white dark:bg-gray-900 rounded-xl shadow-lg">
-            {getPageIcon()}
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <Tag className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {currentGenre?.name || "Genre"} Movies
+              </h1>
+              <p className="text-gray-600 max-sm:text-sm dark:text-gray-400">
+                {totalResults.toLocaleString()} movies found • Page{" "}
+                {currentPage} of {totalPages}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
-              {getPageTitle()}
-            </h1>
-            <p className="text-gray-600 max-sm:text-sm dark:text-gray-400">
-              {totalResults.toLocaleString()} movies found • Page {currentPage}{" "}
-              of {totalPages}
-            </p>
+
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Sort by:
+            </span>
+            <select
+              value={sortParam}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-gray-800 focus:outline-none focus:ring-2 focus:ring-primary shadow-md cursor-pointer"
+            >
+              {sortOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
-        {queryType === "movies" && (
-          <div
-            className="flex flex-wrap gap-3 mb-8 opacity-0 animate-fade-in-up"
-            style={{ animationDelay: "150ms" }}
-          >
-            {[
-              { value: "popular", label: "Popular", icon: TrendingUp },
-              { value: "toprated", label: "Top Rated", icon: Star },
-              { value: "nowplaying", label: "Now Playing", icon: Clock },
-              { value: "upcoming", label: "Upcoming", icon: Calendar },
-            ].map((tab) => (
+        <div
+          className="mb-8 opacity-0 animate-fade-in-up"
+          style={{ animationDelay: "150ms" }}
+        >
+          <div className="flex flex-wrap gap-2">
+            {genres.slice(0, 12).map((genre) => (
               <Link
-                key={tab.value}
-                href={`/movies?type=movies&value=${tab.value}&page=1`}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-300 ${
-                  queryValue === tab.value
+                key={genre.id}
+                href={`/genre/${genre.id}?page=1&sort=${sortParam}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                  genre.id === parseInt(genreId)
                     ? "bg-primary text-white shadow-lg shadow-primary/30"
                     : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-md"
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
+                {genre.name}
               </Link>
             ))}
           </div>
-        )}
+        </div>
 
         {isPending ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
@@ -330,9 +205,7 @@ function MoviesContent() {
               No movies found
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {queryType === "search"
-                ? "Try a different search term"
-                : "No movies available"}
+              No movies available in this genre.
             </p>
           </div>
         ) : (
@@ -391,13 +264,13 @@ function MoviesContent() {
 
             {totalPages > 1 && (
               <div
-                className="flex items-center flex-wrap justify-center gap-2 mt-12 opacity-0 animate-fade-in-up"
+                className="flex max-sm:flex-wrap items-center justify-center gap-2 mt-12 opacity-0 animate-fade-in-up"
                 style={{ animationDelay: "400ms" }}
               >
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`flex items-center gap-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-1 md:px-4 px-2 py-2 rounded-lg font-medium transition-all duration-200 ${
                     currentPage === 1
                       ? "bg-gray-200 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
                       : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-md hover:shadow-lg"
@@ -453,13 +326,23 @@ function MoviesContent() {
   );
 }
 
-const Page = () => {
+const Page = ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = use(params);
+
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-gray-100 dark:bg-gray-950 pt-20">
           <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="h-10 w-48 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse mb-8" />
+            <div className="flex gap-2 mb-8">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-10 w-24 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse"
+                />
+              ))}
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
               {Array.from({ length: 20 }).map((_, i) => (
                 <div
@@ -472,7 +355,7 @@ const Page = () => {
         </div>
       }
     >
-      <MoviesContent />
+      <GenreMoviesContent genreId={id} />
     </Suspense>
   );
 };

@@ -114,17 +114,17 @@ const MoviesByGenre = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8 opacity-0 animate-fade-in-up">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
               Browse by Genre
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-gray-600 max-sm:text-xs dark:text-gray-400 mt-1">
               Explore movies across different genres
             </p>
           </div>
           {selectedGenre && (
             <Link
               href={`/genre/${selectedGenre.id}`}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:scale-105"
+              className="group flex items-center gap-2 max-sm:text-xs px-3 text-center md:px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:scale-105"
             >
               View All {selectedGenre.name}
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -152,7 +152,7 @@ const MoviesByGenre = () => {
               <button
                 key={genre.id}
                 onClick={() => setSelectedGenre(genre)}
-                className={`px-5 py-2.5 rounded-full font-medium text-sm whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
+                className={`px-5 py-2.5 rounded-full max-sm:text-xs font-medium text-sm whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
                   selectedGenre?.id === genre.id
                     ? "bg-primary text-white shadow-lg shadow-primary/30 scale-105"
                     : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"

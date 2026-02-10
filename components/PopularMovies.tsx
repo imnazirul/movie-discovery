@@ -67,17 +67,17 @@ const PopularMovies = () => {
   return (
     <section className="py-16 px-4 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-gray-950 overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-10">
-          <div className="opacity-0 animate-fade-in-up">
+        <div className="flex max-md:flex-col  items-center justify-between mb-10">
+          <div className="opacity-0 max-md:mb-4 animate-fade-in-up">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-red-500/10 rounded-lg">
                 <TrendingUp className="w-5 h-5 text-red-500" />
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 Popular Right Now
               </h2>
             </div>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 max-sm:text-xs dark:text-gray-400">
               Trending movies everyone is watching
             </p>
           </div>
@@ -95,8 +95,8 @@ const PopularMovies = () => {
               <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </button>
             <Link
-              href="/popular"
-              className="group flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:scale-105 ml-2"
+              href={`/movies?type=movies&value=popular&page=1`}
+              className="group flex max-sm:text-xs items-center gap-2 px-3 md:px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:scale-105 ml-2"
             >
               View All
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

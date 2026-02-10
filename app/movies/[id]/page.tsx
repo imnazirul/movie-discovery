@@ -139,7 +139,6 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     new Set(),
   );
 
-  // Fetch all data
   const { data: movie, isPending: isLoadingMovie } = useFetch(
     ["movie-details", id],
     () => fetchMovieDetails(id),
@@ -202,6 +201,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
+      notation: "compact",
       maximumFractionDigits: 0,
     }).format(amount);
   };

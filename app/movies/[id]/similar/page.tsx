@@ -216,7 +216,7 @@ function SimilarMoviesContent({ movieId }: { movieId: string }) {
 
             {totalPages > 1 && (
               <div
-                className="flex items-center justify-center gap-2 mt-12 opacity-0 animate-fade-in-up"
+                className="flex items-center flex-wrap justify-center gap-2 mt-12 opacity-0 animate-fade-in-up"
                 style={{ animationDelay: "400ms" }}
               >
                 <button
