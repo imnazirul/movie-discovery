@@ -62,7 +62,7 @@ export default function Navbar() {
                                     : "text-white"
                                 }`}
                         >
-                            MovZen
+                            MovieZen
                         </span>
                     </Link>
                 </div>
@@ -160,7 +160,7 @@ export default function Navbar() {
                         href="/"
                         className="text-2xl text-gray-900 dark:text-white font-bold"
                     >
-                        MovZen
+                        MovieZen
                     </Link>
                     <Button
                         variant="ghost"

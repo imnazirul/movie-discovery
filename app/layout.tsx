@@ -12,7 +12,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Movzen",
+  title: "MovieZen",
 };
 
 export default function RootLayout({
