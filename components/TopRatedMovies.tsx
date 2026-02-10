@@ -75,7 +75,7 @@ const TopRatedMovies = () => {
           {movies.map((movie, index) => (
             <Link
               key={movie.id}
-              href={`/movie/${movie.id}`}
+              href={`/movies/${movie.id}`}
               className="group relative rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-2 opacity-0 animate-fade-in-up"
               style={{ animationDelay: `${index * 100}ms` }}
             >

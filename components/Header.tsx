@@ -80,7 +80,7 @@ export default function Navbar() {
                             style={{ transitionDelay: `${index * 100}ms` }}
                         >
                             <Link
-                                href={`/${item.toLowerCase()}`}
+                                href={item == "Home" ? "/" : `/${item.toLowerCase()}`}
                                 className={`font-medium hover:opacity-70 transition-opacity ${
                                     isScrolled
                                         ? "text-gray-900 dark:text-white"
@@ -171,7 +171,7 @@ export default function Navbar() {
                             style={{ transitionDelay: isMenuOpen ? `${index * 100}ms` : "0ms" }}
                         >
                             <Link
-                                href={`/${item.toLowerCase()}`}
+                                href={item == "Home" ? "/" : `/${item.toLowerCase()}`}
                                 className="text-lg text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary font-medium transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >

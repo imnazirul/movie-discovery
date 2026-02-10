@@ -112,7 +112,7 @@ const PopularMovies = () => {
           {movies.map((movie, index) => (
             <Link
               key={movie.id}
-              href={`/movie/${movie.id}`}
+              href={`/movies/${movie.id}`}
               className="group relative flex-shrink-0 w-72 md:w-80 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 opacity-0 animate-fade-in-up"
               style={{ animationDelay: `${index * 100}ms` }}
             >
