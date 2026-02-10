@@ -4,6 +4,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/Provider/ThemeProvider";
 import Navbar from "@/components/Header";
+import QueryClientProviderWrapper from "@/components/QueryWrapper";
 const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
@@ -28,10 +29,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <div className="flex-1">{children}</div>
-          </div>
+          <QueryClientProviderWrapper>
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <div className="flex-1">{children}</div>
+            </div>
+          </QueryClientProviderWrapper>
         </ThemeProvider>
       </body>
     </html>

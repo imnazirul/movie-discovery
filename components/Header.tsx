@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, ShoppingBag, User, Heart, Menu, X } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Input from "./ui/Input";
 import Button from "./ui/Button";
@@ -12,7 +12,6 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [isCartOpen, setIsCartOpen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
 
@@ -30,16 +29,17 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const navItems = ["Home", "Shop", "Collections", "About", "Contact"];
+    const navItems = ["Home", "Search", "About", "Contact"];
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 text-black transition-all duration-300 ${isScrolled
-                    ? "dark:bg-gradient-to-r dark:from-[#1a243a] dark:via-[#04102e] dark:to-[#020817] dark:bg-[#020817] bg-white dark:text-white text-black shadow-md py-3"
-                    : "bg-transparent py-6"
-                }`}
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+                isScrolled
+                    ? "bg-white dark:bg-gray-900 shadow-md py-3"
+                    : "bg-black/20 backdrop-blur-sm py-4"
+            }`}
         >
-            <div className="max-w-7xl backdrop-blur-xl mx-auto px-4 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
                 <div className="flex items-center">
                     <Button
                         variant="ghost"
@@ -48,22 +48,24 @@ export default function Navbar() {
                         onClick={() => setIsMenuOpen(true)}
                     >
                         <Menu
-                            className={`h-6 w-6 ${isScrolled || isMenuOpen
-                                    ? "dark:text-white text-black"
-                                    : "dark:text-white text-black"
-                                }`}
+                            className={`h-6 w-6 ${
+                                isScrolled
+                                    ? "text-gray-900 dark:text-white"
+                                    : "text-white"
+                            }`}
                         />
                     </Button>
                     <Link href="/" className="text-2xl font-bold">
                         <span
                             className={`inline-block transition-all duration-500 ${
                                 isMounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
-                            } ${isScrolled
-                                    ? "dark:text-white text-black"
-                                    : "dark:text-white text-black"
-                                }`}
+                            } ${
+                                isScrolled
+                                    ? "text-gray-900 dark:text-white"
+                                    : "text-white"
+                            }`}
                         >
-                            UPMART
+                            MovZen
                         </span>
                     </Link>
                 </div>
@@ -79,10 +81,11 @@ export default function Navbar() {
                         >
                             <Link
                                 href={`/${item.toLowerCase()}`}
-                                className={`font-medium hover:opacity-70 transition-opacity ${isScrolled
-                                        ? "dark:text-white text-black"
-                                        : "dark:text-white text-black"
-                                    }`}
+                                className={`font-medium hover:opacity-70 transition-opacity ${
+                                    isScrolled
+                                        ? "text-gray-900 dark:text-white"
+                                        : "text-white"
+                                }`}
                             >
                                 {item}
                             </Link>
@@ -98,56 +101,20 @@ export default function Navbar() {
                         onClick={() => setIsSearchOpen(!isSearchOpen)}
                     >
                         <Search
-                            className={`h-5 w-5 ${isScrolled
-                                    ? "dark:text-white text-black"
-                                    : "dark:text-white text-black"
-                                }`}
+                            className={`h-5 w-5 ${
+                                isScrolled
+                                    ? "text-gray-900 dark:text-white"
+                                    : "text-white"
+                            }`}
                         />
                     </Button>
                     <ModeToggle isScrolled={isScrolled} />
-                    <Button
-                        onClick={() => router.push("/auth")}
-                        variant="ghost"
-                        size="icon"
-                        className="hidden sm:flex"
-                    >
-                        <User
-                            className={`h-5 w-5 ${isScrolled
-                                    ? "dark:text-white text-black"
-                                    : "dark:text-white text-black"
-                                }`}
-                        />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="hidden sm:flex">
-                        <Heart
-                            className={`h-5 w-5 ${isScrolled
-                                    ? "dark:text-white text-black"
-                                    : "dark:text-white text-black"
-                                }`}
-                        />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="relative"
-                        onClick={() => setIsCartOpen(true)}
-                    >
-                        <ShoppingBag
-                            className={`h-5 w-5 ${isScrolled
-                                    ? "dark:text-white text-black"
-                                    : "dark:text-white text-black"
-                                }`}
-                        />
-                        <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            3
-                        </span>
-                    </Button>
                 </div>
             </div>
 
             {/* Search Overlay */}
             <div
-                className={`absolute top-full left-0 right-0 bg-white shadow-md p-4 transition-all duration-300 ${
+                className={`absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-md p-4 transition-all duration-300 ${
                     isSearchOpen
                         ? "opacity-100 translate-y-0 pointer-events-auto"
                         : "opacity-0 -translate-y-5 pointer-events-none"
@@ -156,8 +123,8 @@ export default function Navbar() {
                 <div className="max-w-3xl mx-auto flex items-center">
                     <Input
                         type="search"
-                        placeholder="Search for products..."
-                        className="flex-1"
+                        placeholder="Search for movies..."
+                        className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
                         autoFocus={isSearchOpen}
                     />
                     <Button
@@ -166,30 +133,30 @@ export default function Navbar() {
                         onClick={() => setIsSearchOpen(false)}
                         className="ml-2"
                     >
-                        <X className="h-5 w-5" />
+                        <X className="h-5 w-5 text-gray-900 dark:text-white" />
                     </Button>
                 </div>
             </div>
 
             {/* Mobile Menu */}
             <div
-                className={`fixed inset-0 backdrop-blur-xl z-50 p-4 transition-transform duration-300 ease-out ${
+                className={`fixed inset-0 bg-white dark:bg-gray-900 z-50 p-4 transition-transform duration-300 ease-out ${
                     isMenuOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
                 <div className="flex justify-between items-center mb-8">
                     <Link
                         href="/"
-                        className="text-2xl dark:text-white text-black font-bold"
+                        className="text-2xl text-gray-900 dark:text-white font-bold"
                     >
-                        UPMART
+                        MovZen
                     </Link>
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => setIsMenuOpen(false)}
                     >
-                        <X className="h-6 dark:text-white w-6" />
+                        <X className="h-6 w-6 text-gray-900 dark:text-white" />
                     </Button>
                 </div>
                 <nav className="flex flex-col space-y-6">
@@ -205,31 +172,13 @@ export default function Navbar() {
                         >
                             <Link
                                 href={`/${item.toLowerCase()}`}
-                                className="text-lg dark:text-white hover:underline font-medium"
+                                className="text-lg text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary font-medium transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 {item}
                             </Link>
                         </div>
                     ))}
-                    <div
-                        className={`transition-all duration-300 ${
-                            isMenuOpen
-                                ? "opacity-100 translate-x-0"
-                                : "opacity-0 -translate-x-5"
-                        }`}
-                        style={{ transitionDelay: isMenuOpen ? "500ms" : "0ms" }}
-                    >
-                        <Link
-                            href="/auth"
-                            className={`font-medium hover:opacity-70 transition-opacity ${isScrolled
-                                    ? "dark:text-white text-black"
-                                    : "dark:text-white text-black"
-                                }`}
-                        >
-                            SignIn / SignUp
-                        </Link>
-                    </div>
                 </nav>
             </div>
         </header>
