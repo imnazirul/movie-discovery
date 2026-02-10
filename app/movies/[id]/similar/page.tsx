@@ -1,30 +1,13 @@
 "use client";
 
+import { use } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { useFetch } from "@/helpers/hooks";
-import {
-  fetchTopRatedMovies,
-  fetchPopularMovies,
-  fetchDiscoverMovies,
-  searchMovies,
-  fetchNowPlayingMovies,
-  fetchUpcomingMovies,
-} from "@/helpers/backend";
+import { fetchSimilarMovies, fetchMovieDetails } from "@/helpers/backend";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Star,
-  Search,
-  X,
-  Film,
-  TrendingUp,
-  Clock,
-  Calendar,
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Star, Film, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Movie {
   id: number;
@@ -36,168 +19,47 @@ interface Movie {
   overview: string;
 }
 
+interface MovieDetails {
+  id: number;
+  title: string;
+  poster_path: string | null;
+}
+
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
-function MoviesContent() {
+function SimilarMoviesContent({ movieId }: { movieId: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const queryType = searchParams.get("type");
-  const queryValue = searchParams.get("value");
-  const showSearch = searchParams.get("search");
   const pageParam = searchParams.get("page");
-
   const [currentPage, setCurrentPage] = useState(
     pageParam ? parseInt(pageParam) : 1,
   );
-  const [searchQuery, setSearchQuery] = useState(
-    queryType === "search" ? queryValue || "" : "",
-  );
-  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
-
 
   useEffect(() => {
     const newPage = pageParam ? parseInt(pageParam) : 1;
     setCurrentPage(newPage);
   }, [pageParam]);
 
+  const { data: movieData } = useFetch(["movie-details", movieId], () =>
+    fetchMovieDetails(movieId),
+  );
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  const { data, isPending } = useFetch(
+    ["similar-movies", movieId, currentPage],
+    () => fetchSimilarMovies(movieId, { page: currentPage }),
+  );
 
-
-  const getQueryKey = () => {
-    if (queryType === "search" && queryValue) {
-      return ["search-movies", queryValue, currentPage];
-    }
-    if (queryType === "movies") {
-      switch (queryValue) {
-        case "toprated":
-          return ["top-rated-movies-all", currentPage];
-        case "popular":
-          return ["popular-movies-all", currentPage];
-        case "nowplaying":
-          return ["now-playing-movies", currentPage];
-        case "upcoming":
-          return ["upcoming-movies", currentPage];
-        default:
-          return ["discover-movies", currentPage];
-      }
-    }
-    if (debouncedSearch && showSearch === "true") {
-      return ["search-movies", debouncedSearch, currentPage];
-    }
-    return ["discover-movies", currentPage];
-  };
-
-  const getQueryFn = () => {
-    if (queryType === "search" && queryValue) {
-      return () => searchMovies({ query: queryValue, page: currentPage });
-    }
-    if (queryType === "movies") {
-      switch (queryValue) {
-        case "toprated":
-          return () => fetchTopRatedMovies({ page: currentPage });
-        case "popular":
-          return () => fetchPopularMovies({ page: currentPage });
-        case "nowplaying":
-          return () => fetchNowPlayingMovies({ page: currentPage });
-        case "upcoming":
-          return () => fetchUpcomingMovies({ page: currentPage });
-        default:
-          return () => fetchDiscoverMovies({ page: currentPage });
-      }
-    }
-    if (debouncedSearch && showSearch === "true") {
-      return () => searchMovies({ query: debouncedSearch, page: currentPage });
-    }
-    return () => fetchDiscoverMovies({ page: currentPage });
-  };
-
-  const getPageTitle = () => {
-    if (queryType === "search" && queryValue) {
-      return `Search Results for "${queryValue}"`;
-    }
-    if (queryType === "movies") {
-      switch (queryValue) {
-        case "toprated":
-          return "Top Rated Movies";
-        case "popular":
-          return "Popular Movies";
-        case "nowplaying":
-          return "Now Playing";
-        case "upcoming":
-          return "Upcoming Movies";
-        default:
-          return "Discover Movies";
-      }
-    }
-    if (debouncedSearch && showSearch === "true") {
-      return `Search Results for "${debouncedSearch}"`;
-    }
-    return "Discover Movies";
-  };
-
-  const getPageIcon = () => {
-    if (queryType === "movies") {
-      switch (queryValue) {
-        case "toprated":
-          return <Star className="w-6 h-6 text-yellow-500" />;
-        case "popular":
-          return <TrendingUp className="w-6 h-6 text-red-500" />;
-        case "nowplaying":
-          return <Clock className="w-6 h-6 text-green-500" />;
-        case "upcoming":
-          return <Calendar className="w-6 h-6 text-blue-500" />;
-        default:
-          return <Film className="w-6 h-6 text-primary" />;
-      }
-    }
-    if (queryType === "search" || (showSearch === "true" && debouncedSearch)) {
-      return <Search className="w-6 h-6 text-primary" />;
-    }
-    return <Film className="w-6 h-6 text-primary" />;
-  };
-
-  const { data, isPending } = useFetch(getQueryKey(), getQueryFn());
-
+  const movieDetails: MovieDetails | null = movieData || null;
   const movies: Movie[] = data?.results || [];
-  const totalPages = Math.min(data?.total_pages || 1, 500); // TMDB limits to 500 pages
+  const totalPages = Math.min(data?.total_pages || 1, 500);
   const totalResults = data?.total_results || 0;
-
-  const buildPageUrl = (page: number) => {
-    const params = new URLSearchParams();
-    if (queryType) params.set("type", queryType);
-    if (queryValue) params.set("value", queryValue);
-    if (showSearch) params.set("search", showSearch);
-    params.set("page", page.toString());
-    return `/movies?${params.toString()}`;
-  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    router.push(buildPageUrl(page));
+    router.push(`/movies/${movieId}/similar?page=${page}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(
-        `/movies?type=search&value=${encodeURIComponent(searchQuery)}&search=true&page=1`,
-      );
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    router.push("/movies?search=true");
-  };
-
 
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
@@ -238,85 +100,46 @@ function MoviesContent() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 pt-20">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Link
-          href="/"
+          href={`/movies/${movieId}`}
           className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary mb-6 transition-colors opacity-0 animate-fade-in-up"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          Back to Movie
         </Link>
-
-        {(showSearch === "true") && (
-          <div
-            className="mb-8 opacity-0 animate-fade-in-up"
-            style={{ animationDelay: "50ms" }}
-          >
-            <form onSubmit={handleSearch} className="relative max-w-2xl">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for movies..."
-                className="w-full px-5 py-4 pl-12 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-800 focus:outline-none focus:ring-2 focus:ring-primary shadow-lg text-lg"
-                autoFocus
-              />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-400" />
-                </button>
-              )}
-            </form>
-          </div>
-        )}
 
         <div
           className="flex items-center gap-4 mb-8 opacity-0 animate-fade-in-up"
           style={{ animationDelay: "100ms" }}
         >
-          <div className="p-3 bg-white dark:bg-gray-900 rounded-xl shadow-lg">
-            {getPageIcon()}
-          </div>
+          {movieDetails?.poster_path && (
+            <div className="w-16 h-24 rounded-lg overflow-hidden shadow-lg flex-shrink-0">
+              <Image
+                src={`${TMDB_IMAGE_BASE}${movieDetails.poster_path}`}
+                alt={movieDetails.title || ""}
+                width={64}
+                height={96}
+                className="object-cover w-full h-full"
+              />
+            </div>
+          )}
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-              {getPageTitle()}
+              Similar Movies
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            {movieDetails && (
+              <p className="text-gray-600 dark:text-gray-400">
+                Movies similar to{" "}
+                <span className="text-primary font-medium">
+                  {movieDetails.title}
+                </span>
+              </p>
+            )}
+            <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">
               {totalResults.toLocaleString()} movies found • Page {currentPage}{" "}
               of {totalPages}
             </p>
           </div>
         </div>
-
-        {queryType === "movies" && (
-          <div
-            className="flex flex-wrap gap-3 mb-8 opacity-0 animate-fade-in-up"
-            style={{ animationDelay: "150ms" }}
-          >
-            {[
-              { value: "popular", label: "Popular", icon: TrendingUp },
-              { value: "toprated", label: "Top Rated", icon: Star },
-              { value: "nowplaying", label: "Now Playing", icon: Clock },
-              { value: "upcoming", label: "Upcoming", icon: Calendar },
-            ].map((tab) => (
-              <Link
-                key={tab.value}
-                href={`/movies?type=movies&value=${tab.value}&page=1`}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-300 ${
-                  queryValue === tab.value
-                    ? "bg-primary text-white shadow-lg shadow-primary/30"
-                    : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-md"
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </Link>
-            ))}
-          </div>
-        )}
 
         {isPending ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
@@ -331,12 +154,10 @@ function MoviesContent() {
           <div className="text-center py-20">
             <Film className="w-16 h-16 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No movies found
+              No similar movies found
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {queryType === "search"
-                ? "Try a different search term"
-                : "No movies available"}
+              We couldn&apos;t find any similar movies for this title.
             </p>
           </div>
         ) : (
@@ -457,7 +278,9 @@ function MoviesContent() {
   );
 }
 
-const Page = () => {
+const Page = ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = use(params);
+
   return (
     <Suspense
       fallback={
@@ -476,7 +299,7 @@ const Page = () => {
         </div>
       }
     >
-      <MoviesContent />
+      <SimilarMoviesContent movieId={id} />
     </Suspense>
   );
 };

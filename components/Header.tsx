@@ -13,6 +13,7 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const router = useRouter();
 
     useEffect(() => {
@@ -29,15 +30,14 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const navItems = ["Home", "Search", "About", "Contact"];
+    const navItems = ["Home", "Search", "Movies", "About"];
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-                isScrolled
-                    ? "bg-white dark:bg-gray-900 shadow-md py-3"
-                    : "bg-black/20 backdrop-blur-sm py-4"
-            }`}
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+                ? "bg-white dark:bg-gray-900 shadow-md py-3"
+                : "bg-black/20 backdrop-blur-sm py-4"
+                }`}
         >
             <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
                 <div className="flex items-center">
@@ -48,22 +48,19 @@ export default function Navbar() {
                         onClick={() => setIsMenuOpen(true)}
                     >
                         <Menu
-                            className={`h-6 w-6 ${
-                                isScrolled
-                                    ? "text-gray-900 dark:text-white"
-                                    : "text-white"
-                            }`}
+                            className={`h-6 w-6 ${isScrolled
+                                ? "text-gray-900 dark:text-white"
+                                : "text-white"
+                                }`}
                         />
                     </Button>
                     <Link href="/" className="text-2xl font-bold">
                         <span
-                            className={`inline-block transition-all duration-500 ${
-                                isMounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
-                            } ${
-                                isScrolled
+                            className={`inline-block transition-all duration-500 ${isMounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
+                                } ${isScrolled
                                     ? "text-gray-900 dark:text-white"
                                     : "text-white"
-                            }`}
+                                }`}
                         >
                             MovZen
                         </span>
@@ -74,18 +71,16 @@ export default function Navbar() {
                     {navItems.map((item, index) => (
                         <div
                             key={item}
-                            className={`transition-all duration-500 ${
-                                isMounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
-                            }`}
+                            className={`transition-all duration-500 ${isMounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
+                                }`}
                             style={{ transitionDelay: `${index * 100}ms` }}
                         >
                             <Link
-                                href={item == "Home" ? "/" : `/${item.toLowerCase()}`}
-                                className={`font-medium hover:opacity-70 transition-opacity ${
-                                    isScrolled
-                                        ? "text-gray-900 dark:text-white"
-                                        : "text-white"
-                                }`}
+                                href={item == 'Search' ? "/movies?search=true" : item == "Home" ? "/" : `/${item.toLowerCase()}`}
+                                className={`font-medium hover:opacity-70 transition-opacity ${isScrolled
+                                    ? "text-gray-900 dark:text-white"
+                                    : "text-white"
+                                    }`}
                             >
                                 {item}
                             </Link>
@@ -101,11 +96,10 @@ export default function Navbar() {
                         onClick={() => setIsSearchOpen(!isSearchOpen)}
                     >
                         <Search
-                            className={`h-5 w-5 ${
-                                isScrolled
-                                    ? "text-gray-900 dark:text-white"
-                                    : "text-white"
-                            }`}
+                            className={`h-5 w-5 ${isScrolled
+                                ? "text-gray-900 dark:text-white"
+                                : "text-white"
+                                }`}
                         />
                     </Button>
                     <ModeToggle isScrolled={isScrolled} />
@@ -114,19 +108,37 @@ export default function Navbar() {
 
             {/* Search Overlay */}
             <div
-                className={`absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-md p-4 transition-all duration-300 ${
-                    isSearchOpen
-                        ? "opacity-100 translate-y-0 pointer-events-auto"
-                        : "opacity-0 -translate-y-5 pointer-events-none"
-                }`}
+                className={`absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-md p-4 transition-all duration-300 ${isSearchOpen
+                    ? "opacity-100 translate-y-0 pointer-events-auto"
+                    : "opacity-0 -translate-y-5 pointer-events-none"
+                    }`}
             >
                 <div className="max-w-3xl mx-auto flex items-center">
                     <Input
-                        type="search"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && searchQuery.trim()) {
+                                router.push(`/movies?type=search&value=${searchQuery}&page=1`)
+                            }
+                        }}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        type="text"
                         placeholder="Search for movies..."
                         className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
                         autoFocus={isSearchOpen}
                     />
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                            if (searchQuery.trim()) {
+                                router.push(`/movies?type=search&value=${searchQuery}&page=1`)
+                            }
+                        }}
+                        className="ml-2"
+                    >
+                        <Search className="h-5 w-5 text-gray-900 dark:text-white" />
+                    </Button>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -140,9 +152,8 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             <div
-                className={`fixed inset-0 bg-white dark:bg-gray-900 z-50 p-4 transition-transform duration-300 ease-out ${
-                    isMenuOpen ? "translate-x-0" : "-translate-x-full"
-                }`}
+                className={`fixed inset-0 bg-white dark:bg-gray-900 z-50 p-4 transition-transform duration-300 ease-out ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
+                    }`}
             >
                 <div className="flex justify-between items-center mb-8">
                     <Link
@@ -163,15 +174,14 @@ export default function Navbar() {
                     {navItems.map((item, index) => (
                         <div
                             key={item}
-                            className={`transition-all duration-300 ${
-                                isMenuOpen
-                                    ? "opacity-100 translate-x-0"
-                                    : "opacity-0 -translate-x-5"
-                            }`}
+                            className={`transition-all duration-300 ${isMenuOpen
+                                ? "opacity-100 translate-x-0"
+                                : "opacity-0 -translate-x-5"
+                                }`}
                             style={{ transitionDelay: isMenuOpen ? `${index * 100}ms` : "0ms" }}
                         >
                             <Link
-                                href={item == "Home" ? "/" : `/${item.toLowerCase()}`}
+                                href={item == 'Search' ? "/movies?search=true" : item == "Home" ? "/" : `/${item.toLowerCase()}`}
                                 className="text-lg text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary font-medium transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
