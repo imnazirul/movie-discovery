@@ -76,7 +76,7 @@ export default function Navbar() {
                             style={{ transitionDelay: `${index * 100}ms` }}
                         >
                             <Link
-                                href={item == 'Search' ? "/movies?search=true" : item == "Home" ? "/" : `/${item.toLowerCase()}`}
+                                href={item == 'Search' ? "/movies?search=true" : item == "Home" ? "/" : `/${item.toLowerCase().replace(' ', '-')}`}
                                 className={`font-medium hover:opacity-70 transition-opacity ${isScrolled
                                     ? "text-gray-900 dark:text-white"
                                     : "text-white"
@@ -181,7 +181,7 @@ export default function Navbar() {
                             style={{ transitionDelay: isMenuOpen ? `${index * 100}ms` : "0ms" }}
                         >
                             <Link
-                                href={item == 'Search' ? "/movies?search=true" : item == "Home" ? "/" : `/${item.toLowerCase()}`}
+                                href={item == 'Search' ? "/movies?search=true" : item == "Home" ? "/" : `/${item.toLowerCase().replace(' ', '-')}`}
                                 className="text-lg text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary font-medium transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
