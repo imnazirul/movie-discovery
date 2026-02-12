@@ -1,34 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Star, Clock, Trash2, ArrowLeft, Film, X } from "lucide-react";
-import { TMDB_IMAGE_BASE } from "@/helpers/api";
-import moment from "moment";
 import RecentMovieCard from "./_components/RecentMovieCard";
 import { useProvider } from "@/contexts/ProviderContext";
 
 const RecentlyViewedPage = () => {
   const { recentlyViewed, removeRecentlyViewedMovie, clearAllRecentlyViewed } =
     useProvider();
-
-  // if (!isLoaded) {
-  //   return (
-  //     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 pt-20">
-  //       <div className="max-w-7xl mx-auto px-4 py-8">
-  //         <div className="h-10 w-64 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse mb-8" />
-  //         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-  //           {Array.from({ length: 10 }).map((_, i) => (
-  //             <div
-  //               key={i}
-  //               className="aspect-[2/3] bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse"
-  //             />
-  //           ))}
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 pt-20">
