@@ -36,7 +36,7 @@ export default function Navbar() {
         <header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
                 ? "bg-white dark:bg-gray-900 shadow-md py-3"
-                : "bg-black/20 backdrop-blur-sm py-4"
+                : "bg-black/40 dark:bg-black/20 backdrop-blur-sm py-4"
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
@@ -44,7 +44,7 @@ export default function Navbar() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="md:hidden mr-2"
+                        className="lg:hidden mr-2"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         <Menu
@@ -67,7 +67,7 @@ export default function Navbar() {
                     </Link>
                 </div>
 
-                <nav className="hidden md:flex items-center space-x-8">
+                <nav className="hidden lg:flex items-center space-x-8">
                     {navItems.map((item, index) => (
                         <div
                             key={item}

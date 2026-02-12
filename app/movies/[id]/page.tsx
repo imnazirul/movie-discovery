@@ -346,7 +346,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
                 className={`w-5 h-5 ${isInWatchLater(movieDetails.id) ? "fill-primary" : ""}`}
               />
               {isInWatchLater(movieDetails.id)
-                ? "Saved to Watch Later"
+                ? "Watch Later"
                 : "Watch Later"}
             </button>
           </div>
@@ -787,7 +787,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
                       <div className="relative">
                         <Quote className="absolute -left-2 -top-2 w-4 h-4 text-gray-200 dark:text-gray-700" />
                         <p
-                          className={`text-gray-700 dark:text-gray-300 text-sm text-wrap flex over leading-relaxed pl-4 ${
+                          className={`text-gray-700 dark:text-gray-300 text-sm  leading-relaxed pl-4 ${
                             !expandedReviews.has(review.id)
                               ? "line-clamp-3"
                               : ""

@@ -33,7 +33,7 @@ export default function HeroSlider() {
         const genreData = await get("/genre/movie/list");
         const genresWithImages: GenreWithImage[] = [];
 
-        for (const genre of genreData.genres) {
+        for (const genre of genreData.genres?.slice(0, 20)) {
           try {
             const moviesData = await get("/discover/movie", {
               with_genres: genre.id,
