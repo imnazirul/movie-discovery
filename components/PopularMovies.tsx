@@ -65,7 +65,7 @@ const PopularMovies = () => {
   }
 
   return (
-    <section className="py-16 px-4 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-gray-950 overflow-hidden">
+    <section className="py-5 md:py-16  px-4 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-gray-950 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="flex max-md:flex-col  items-center justify-between mb-10">
           <div className="opacity-0 max-md:mb-4 animate-fade-in-up">

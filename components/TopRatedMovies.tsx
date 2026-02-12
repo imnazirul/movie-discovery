@@ -73,7 +73,7 @@ const TopRatedMovies = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
           {movies.map((movie, index) => (
-            <TopRatedMovieCard index={index} movie={movie} />
+            <TopRatedMovieCard key={index} index={index} movie={movie} />
           ))}
         </div>
       </div>

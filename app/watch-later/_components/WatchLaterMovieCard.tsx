@@ -1,19 +1,18 @@
 import { TMDB_IMAGE_BASE } from "@/helpers/api";
-import { useWatchLater } from "@/helpers/useLocalStorage";
 import { Bookmark, Clock, Film, Star, X } from "lucide-react";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 
 const WatchLaterMovieCard = ({
+  removeMovie,
   movie,
   index,
 }: {
+  removeMovie: any;
   movie: any;
   index: number;
 }) => {
-  const { removeMovie } = useWatchLater();
-
   return (
     <div
       className="group relative rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-2 opacity-0 animate-fade-in-up"
@@ -39,7 +38,7 @@ const WatchLaterMovieCard = ({
           <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/70 backdrop-blur-sm rounded-md">
             <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
             <span className="text-white text-xs font-semibold">
-              {movie.vote_average.toFixed(1)}
+              {movie?.vote_average?.toFixed(1)}
             </span>
           </div>
 

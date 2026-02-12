@@ -8,6 +8,7 @@ import { useFetch } from "@/helpers/hooks";
 import { fetchGenreList, fetchMoviesByGenre } from "@/helpers/backend";
 import { TMDB_IMAGE_BASE } from "@/helpers/api";
 import MovieCard from "./MovieCard";
+import { useIsMobile } from "@/lib/use-mobile";
 
 interface Genre {
   id: number;
@@ -31,6 +32,7 @@ const PopularMoviesPerGenre = () => {
   const [genresWithMovies, setGenresWithMovies] = useState<GenreWithMovies[]>(
     [],
   );
+  const isMobile = useIsMobile();
   const [isLoadingMovies, setIsLoadingMovies] = useState(true);
 
   const { data: genreData, isPending: isLoadingGenres } = useFetch(
@@ -57,10 +59,10 @@ const PopularMoviesPerGenre = () => {
 
           genresWithMoviesData.push({
             ...genre,
-            movies: moviesData.results?.slice(0, 5) || [],
+            movies: moviesData.results?.slice(0, isMobile ? 4 : 5) || [],
           });
         } catch (error) {
-          console.error(`Failed to fetch movies for genre ${genre.name}`);
+          //err
         }
       }
 
@@ -69,7 +71,7 @@ const PopularMoviesPerGenre = () => {
     }
 
     fetchMoviesForGenres();
-  }, [genres]);
+  }, [genres, isMobile]);
 
   const isLoading = isLoadingGenres || isLoadingMovies;
 

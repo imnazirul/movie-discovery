@@ -1,12 +1,12 @@
 import { TMDB_IMAGE_BASE } from "@/helpers/api";
-import { useWatchLater } from "@/helpers/useLocalStorage";
 import { Bookmark, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "./ui/Button";
+import { useProvider } from "@/contexts/ProviderContext";
 
 const TopRatedMovieCard = ({ movie, index }: { movie: any; index: number }) => {
-  const { toggleMovie: toggleWatchLater, isInWatchLater } = useWatchLater();
+  const { toggleWatchLaterMovie, isInWatchLater } = useProvider();
   return (
     <div
       key={movie.id}
@@ -62,10 +62,9 @@ const TopRatedMovieCard = ({ movie, index }: { movie: any; index: number }) => {
       <Button
         className="absolute top-0 size-7 z-100 -left-2"
         onClick={(e) => {
-          console.log("hello");
           e.preventDefault();
           e.stopPropagation();
-          toggleWatchLater(movie);
+          toggleWatchLaterMovie(movie);
         }}
       >
         <Bookmark

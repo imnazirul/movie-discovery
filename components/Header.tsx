@@ -77,7 +77,7 @@ export default function Navbar() {
                         >
                             <Link
                                 href={item == 'Search' ? "/movies?search=true" : item == "Home" ? "/" : `/${item.toLowerCase().replace(' ', '-')}`}
-                                className={`font-medium hover:opacity-70 transition-opacity ${isScrolled
+                                className={`font-medium text-sm hover:opacity-70 transition-opacity ${isScrolled
                                     ? "text-gray-900 dark:text-white"
                                     : "text-white"
                                     }`}
@@ -113,7 +113,7 @@ export default function Navbar() {
                     : "opacity-0 -translate-y-5 pointer-events-none"
                     }`}
             >
-                <div className="md:max-w-3xl sm:max-w-full mx-auto justify-center flex items-center">
+                <div className="md:max-w-3xl  max-sm:max-w-full mx-auto justify-center flex items-center">
                     <Input
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && searchQuery.trim()) {
@@ -124,7 +124,7 @@ export default function Navbar() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         type="text"
                         placeholder="Search for movies..."
-                        className="md:flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
+                        className="md:flex-1 text-sm px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
                         autoFocus={isSearchOpen}
                     />
                     <Button
@@ -135,7 +135,7 @@ export default function Navbar() {
                                 router.push(`/movies?type=search&value=${searchQuery}&page=1`)
                             }
                         }}
-                        className="ml-2 max-sm:px-2 "
+                        className="ml-4 max-sm:px-0"
                     >
                         <Search className="h-5 w-5 text-gray-900 dark:text-white" />
                     </Button>
@@ -143,7 +143,7 @@ export default function Navbar() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setIsSearchOpen(false)}
-                        className="ml-2 max-sm:px-2 "
+                        className="ml-3 max-sm:px-0"
                     >
                         <X className="h-5 w-5 text-gray-900 dark:text-white" />
                     </Button>
@@ -182,7 +182,7 @@ export default function Navbar() {
                         >
                             <Link
                                 href={item == 'Search' ? "/movies?search=true" : item == "Home" ? "/" : `/${item.toLowerCase().replace(' ', '-')}`}
-                                className="text-lg text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary font-medium transition-colors"
+                                className="text-base text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary font-medium transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 {item}

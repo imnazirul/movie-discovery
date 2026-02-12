@@ -1,33 +1,34 @@
 "use client";
 
-import { useRecentlyViewed, StoredMovie } from "@/helpers/useLocalStorage";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Clock, Trash2, ArrowLeft, Film, X } from "lucide-react";
 import { TMDB_IMAGE_BASE } from "@/helpers/api";
 import moment from "moment";
 import RecentMovieCard from "./_components/RecentMovieCard";
+import { useProvider } from "@/contexts/ProviderContext";
 
 const RecentlyViewedPage = () => {
-  const { movies, removeMovie, clearAll, isLoaded } = useRecentlyViewed();
+  const { recentlyViewed, removeRecentlyViewedMovie, clearAllRecentlyViewed } =
+    useProvider();
 
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 pt-20">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="h-10 w-64 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse mb-8" />
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div
-                key={i}
-                className="aspect-[2/3] bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (!isLoaded) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 pt-20">
+  //       <div className="max-w-7xl mx-auto px-4 py-8">
+  //         <div className="h-10 w-64 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse mb-8" />
+  //         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+  //           {Array.from({ length: 10 }).map((_, i) => (
+  //             <div
+  //               key={i}
+  //               className="aspect-[2/3] bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse"
+  //             />
+  //           ))}
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 pt-20">
@@ -53,13 +54,14 @@ const RecentlyViewedPage = () => {
                 Recently Viewed
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
-                {movies.length} {movies.length === 1 ? "movie" : "movies"} in
-                your history
+                {recentlyViewed.length}{" "}
+                {recentlyViewed.length === 1 ? "movie" : "movies"} in your
+                history
               </p>
             </div>
           </div>
 
-          {movies.length > 0 && (
+          {recentlyViewed.length > 0 && (
             <button
               onClick={() => {
                 if (
@@ -67,7 +69,7 @@ const RecentlyViewedPage = () => {
                     "Are you sure you want to clear your viewing history?",
                   )
                 ) {
-                  clearAll();
+                  clearAllRecentlyViewed();
                 }
               }}
               className="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors font-medium"
@@ -78,7 +80,7 @@ const RecentlyViewedPage = () => {
           )}
         </div>
 
-        {movies.length === 0 ? (
+        {recentlyViewed.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center py-20 opacity-0 animate-fade-in-up"
             style={{ animationDelay: "100ms" }}
@@ -102,8 +104,12 @@ const RecentlyViewedPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            {movies.map((movie, index) => (
-              <RecentMovieCard index={index} movie={movie} />
+            {recentlyViewed.map((movie, index) => (
+              <RecentMovieCard
+                index={index}
+                movie={movie}
+                removeMovie={removeRecentlyViewedMovie}
+              />
             ))}
           </div>
         )}

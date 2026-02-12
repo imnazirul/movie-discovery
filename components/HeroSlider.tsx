@@ -202,7 +202,7 @@ export default function HeroSlider() {
             </button>
           </div>
 
-          <div className="flex items-center justify-center gap-2 mt-10">
+          <div className="flex items-center justify-center flex-nowrap overflow-hidden gap-2 mt-10">
             {genres.map((genre, index) => (
               <button
                 key={genre.id}

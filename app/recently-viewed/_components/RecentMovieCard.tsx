@@ -1,13 +1,18 @@
 import { TMDB_IMAGE_BASE } from "@/helpers/api";
-import { useRecentlyViewed } from "@/helpers/useLocalStorage";
 import { Clock, Film, Star, X } from "lucide-react";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 
-const RecentMovieCard = ({ movie, index }: { movie: any; index: number }) => {
-  const { removeMovie } = useRecentlyViewed();
-
+const RecentMovieCard = ({
+  movie,
+  index,
+  removeMovie,
+}: {
+  movie: any;
+  removeMovie: any;
+  index: number;
+}) => {
   return (
     <div
       className="group relative rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-2 opacity-0 animate-fade-in-up"

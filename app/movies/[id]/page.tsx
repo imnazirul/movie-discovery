@@ -11,7 +11,6 @@ import {
   fetchMovieVideos,
 } from "@/helpers/backend";
 import { useFetch } from "@/helpers/hooks";
-import { useRecentlyViewed, useWatchLater } from "@/helpers/useLocalStorage";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -32,6 +31,7 @@ import {
   Bookmark,
 } from "lucide-react";
 import { useState } from "react";
+import { useProvider } from "@/contexts/ProviderContext";
 
 interface Genre {
   id: number;
@@ -141,8 +141,8 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     new Set(),
   );
 
-  const { addMovie: addToRecentlyViewed } = useRecentlyViewed();
-  const { toggleMovie: toggleWatchLater, isInWatchLater } = useWatchLater();
+  const { toggleWatchLaterMovie, isInWatchLater, addRecentlyViewedMovie } =
+    useProvider();
 
   const { data: movie, isPending: isLoadingMovie } = useFetch(
     ["movie-details", id],
@@ -151,7 +151,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
 
   useEffect(() => {
     if (movie) {
-      addToRecentlyViewed({
+      addRecentlyViewedMovie({
         id: movie.id,
         title: movie.title,
         poster_path: movie.poster_path,
@@ -160,7 +160,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         overview: movie.overview,
       });
     }
-  }, [movie, addToRecentlyViewed]);
+  }, [movie]);
 
   const { data: imagesData } = useFetch(["movie-images", id], () =>
     fetchMovieImages(id),
@@ -327,7 +327,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
 
             <button
               onClick={() =>
-                toggleWatchLater({
+                toggleWatchLaterMovie({
                   id: movieDetails.id,
                   title: movieDetails.title,
                   poster_path: movieDetails.poster_path,
@@ -740,48 +740,54 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
                   className="bg-white dark:bg-gray-900 rounded-2xl p-6"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-800 flex-shrink-0">
-                      {review.author_details.avatar_path ? (
-                        <Image
-                          src={
-                            review.author_details.avatar_path.startsWith(
-                              "/http",
-                            )
-                              ? review.author_details.avatar_path.substring(1)
-                              : `${TMDB_IMAGE_W200}${review.author_details.avatar_path}`
-                          }
-                          alt={review.author}
-                          width={48}
-                          height={48}
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <User className="w-6 h-6 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <p className="font-semibold text-gray-900 dark:text-white">
-                          {review.author}
-                        </p>
-                        {review.author_details.rating && (
-                          <div className="flex items-center gap-1 px-2 py-0.5 bg-yellow-500/20 rounded-full">
-                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {review.author_details.rating}
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-800 flex-shrink-0">
+                          {review.author_details.avatar_path ? (
+                            <Image
+                              src={
+                                review.author_details.avatar_path.startsWith(
+                                  "/http",
+                                )
+                                  ? review.author_details.avatar_path.substring(
+                                      1,
+                                    )
+                                  : `${TMDB_IMAGE_W200}${review.author_details.avatar_path}`
+                              }
+                              alt={review.author}
+                              width={48}
+                              height={48}
+                              className="object-cover w-full h-full"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <User className="w-6 h-6 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col  gap-1 ">
+                          <p className="font-semibold text-gray-900 dark:text-white">
+                            {review.author}
+                          </p>
+                          <p className="flex items-center gap-2 mb-1">
+                            {review.author_details.rating && (
+                              <div className="flex items-center gap-1 px-2 py-0.5 bg-yellow-500/20 rounded-full">
+                                <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {review.author_details.rating}
+                                </span>
+                              </div>
+                            )}
+                            <span className="text-gray-500 dark:text-gray-400 text-sm">
+                              {new Date(review.created_at).toLocaleDateString()}
                             </span>
-                          </div>
-                        )}
-                        <span className="text-gray-500 dark:text-gray-400 text-sm">
-                          {new Date(review.created_at).toLocaleDateString()}
-                        </span>
+                          </p>
+                        </div>
                       </div>
                       <div className="relative">
-                        <Quote className="absolute -left-2 -top-2 w-6 h-6 text-gray-200 dark:text-gray-700" />
+                        <Quote className="absolute -left-2 -top-2 w-4 h-4 text-gray-200 dark:text-gray-700" />
                         <p
-                          className={`text-gray-700 dark:text-gray-300 leading-relaxed pl-4 ${
+                          className={`text-gray-700 dark:text-gray-300 text-sm text-wrap flex over leading-relaxed pl-4 ${
                             !expandedReviews.has(review.id)
                               ? "line-clamp-3"
                               : ""

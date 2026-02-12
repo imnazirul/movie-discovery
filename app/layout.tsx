@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/Provider/ThemeProvider";
 import Navbar from "@/components/Header";
 import QueryClientProviderWrapper from "@/components/QueryWrapper";
+import Provider from "@/Provider/Provider";
 const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
@@ -30,10 +31,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryClientProviderWrapper>
-            <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <div className="flex-1">{children}</div>
-            </div>
+            <Provider>
+              <div className="flex min-h-screen flex-col">
+                <Navbar />
+                <div className="flex-1">{children}</div>
+              </div>
+            </Provider>
           </QueryClientProviderWrapper>
         </ThemeProvider>
       </body>
