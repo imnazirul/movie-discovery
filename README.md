@@ -62,7 +62,7 @@ npm install
 cp .env.example .env.local
 
 # Add your TMDB API key
-NEXT_PUBLIC_TMDB_API_KEY=your_api_key_here
+NEXT_PUBLIC_ACCESS_TOKEN=your_access_token_here
 ```
 
 4. Run the development server
