@@ -25,6 +25,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { TMDB_IMAGE_BASE } from "@/helpers/api";
 
 interface Movie {
   id: number;
@@ -35,8 +36,6 @@ interface Movie {
   release_date: string;
   overview: string;
 }
-
-const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
 function MoviesContent() {
   const searchParams = useSearchParams();

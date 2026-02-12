@@ -16,6 +16,7 @@ import {
   Tag,
 } from "lucide-react";
 import { useIsMobile } from "@/lib/use-mobile";
+import { TMDB_IMAGE_BASE } from "@/helpers/api";
 
 interface Movie {
   id: number;
@@ -31,8 +32,6 @@ interface Genre {
   id: number;
   name: string;
 }
-
-const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
 export function GenreMoviesContent({ genreId }: { genreId: string }) {
   const searchParams = useSearchParams();
@@ -70,9 +69,9 @@ export function GenreMoviesContent({ genreId }: { genreId: string }) {
   const sortOptions = [
     { value: "popularity.desc", label: "Most Popular" },
     { value: "vote_average.desc", label: "Highest Rated" },
-    { value: "release_date.desc", label: "Newest First" },
-    { value: "release_date.asc", label: "Oldest First" },
-    { value: "title.asc", label: "A-Z" },
+    { value: "release_date.desc", label: "Release date" },
+    // { value: "release_date.asc", label: "Oldest First" },
+    { value: "title.asc", label: "Title" },
   ];
 
   const handlePageChange = (page: number) => {

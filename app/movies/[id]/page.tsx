@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect } from "react";
 import {
   fetchMovieDetails,
   fetchMovieImages,
@@ -11,6 +11,7 @@ import {
   fetchMovieVideos,
 } from "@/helpers/backend";
 import { useFetch } from "@/helpers/hooks";
+import { useRecentlyViewed, useWatchLater } from "@/helpers/useLocalStorage";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -28,6 +29,7 @@ import {
   User,
   Quote,
   ExternalLink,
+  Bookmark,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -139,17 +141,33 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     new Set(),
   );
 
+  const { addMovie: addToRecentlyViewed } = useRecentlyViewed();
+  const { toggleMovie: toggleWatchLater, isInWatchLater } = useWatchLater();
+
   const { data: movie, isPending: isLoadingMovie } = useFetch(
     ["movie-details", id],
     () => fetchMovieDetails(id),
   );
+
+  useEffect(() => {
+    if (movie) {
+      addToRecentlyViewed({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        vote_average: movie.vote_average,
+        release_date: movie.release_date,
+        overview: movie.overview,
+      });
+    }
+  }, [movie, addToRecentlyViewed]);
 
   const { data: imagesData } = useFetch(["movie-images", id], () =>
     fetchMovieImages(id),
   );
 
   const { data: similarData } = useFetch(["similar-movies", id], () =>
-    fetchSimilarMovies(id),
+    fetchSimilarMovies(id, { sort_by: "popularity.desc" }),
   );
 
   const { data: creditsData } = useFetch(["movie-credits", id], () =>
@@ -306,6 +324,31 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
                 Watch Trailer
               </button>
             )}
+
+            <button
+              onClick={() =>
+                toggleWatchLater({
+                  id: movieDetails.id,
+                  title: movieDetails.title,
+                  poster_path: movieDetails.poster_path,
+                  vote_average: movieDetails.vote_average,
+                  release_date: movieDetails.release_date,
+                  overview: movieDetails.overview,
+                })
+              }
+              className={`w-full mt-3 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
+                isInWatchLater(movieDetails.id)
+                  ? "bg-primary/20 text-primary border-2 border-primary"
+                  : "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700"
+              }`}
+            >
+              <Bookmark
+                className={`w-5 h-5 ${isInWatchLater(movieDetails.id) ? "fill-primary" : ""}`}
+              />
+              {isInWatchLater(movieDetails.id)
+                ? "Saved to Watch Later"
+                : "Watch Later"}
+            </button>
           </div>
 
           <div className="flex-1 pt-0 md:pt-24">

@@ -8,6 +8,7 @@ import { fetchSimilarMovies, fetchMovieDetails } from "@/helpers/backend";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Film, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { TMDB_IMAGE_BASE } from "@/helpers/api";
 
 interface Movie {
   id: number;
@@ -25,7 +26,6 @@ interface MovieDetails {
   poster_path: string | null;
 }
 
-const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
 function SimilarMoviesContent({ movieId }: { movieId: string }) {
   const searchParams = useSearchParams();

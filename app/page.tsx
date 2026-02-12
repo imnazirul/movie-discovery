@@ -1,6 +1,7 @@
 import Hero from "@/components/HeroSlider";
 import MoviesByGenre from "@/components/MoviesByGenre";
 import PopularMovies from "@/components/PopularMovies";
+import PopularMoviesPerGenre from "@/components/PopularMoviesPerGenre";
 import TopRatedMovies from "@/components/TopRatedMovies";
 
 const Page = () => {
@@ -9,6 +10,7 @@ const Page = () => {
       <Hero />
       <TopRatedMovies />
       <PopularMovies />
+      <PopularMoviesPerGenre />
       <MoviesByGenre />
     </div>
   );
