@@ -23,7 +23,7 @@ const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/original";
 
 export default function HeroSlider() {
   const [genres, setGenres] = useState<GenreWithImage[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(3);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -33,7 +33,7 @@ export default function HeroSlider() {
         const genreData = await get("/genre/movie/list");
         const genresWithImages: GenreWithImage[] = [];
 
-        for (const genre of genreData.genres.slice(0, 10)) {
+        for (const genre of genreData.genres) {
           try {
             const moviesData = await get("/discover/movie", {
               with_genres: genre.id,

@@ -30,7 +30,7 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const navItems = ["Home", "Search", "Movies", "Genre"];
+    const navItems = ["Home", "Search", "Movies", "Genre", 'Recently Viewed', "Watch Later"];
 
     return (
         <header
